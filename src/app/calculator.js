@@ -1,10 +1,8 @@
-// components/Calculator.js
+"use client";
 import React, { useState } from 'react';
-import { useClient } from 'next/client';
-
+import '../../public/calculator.css';
 function Calculator() {
   const [expression, setExpression] = useState('');
-  useClient(); // Wrap the parent component with useClient to make it a Client Component
 
   const handleInput = (value) => {
     setExpression((prevExpression) => prevExpression + value);
@@ -16,17 +14,30 @@ function Calculator() {
 
   const calculateResult = () => {
     try {
-      const result = eval(expression);
+      const result = new Function('return ' + expression)();
       setExpression(result.toString());
     } catch (error) {
       setExpression('Error');
     }
   };
 
+  const handleButtonClick = (value) => {
+    handleInput(value);
+    // Add the button press animation class
+    const button = document.getElementById(value);
+    button.classList.add('button-press-animation');
+    // Remove the button press animation class after a short delay
+    setTimeout(() => {
+      button.classList.remove('button-press-animation');
+    }, 100);
+  };
+
   return (
     <div className="calculator">
-      <input type="text" value={expression} readOnly />
+      <input type="text" className="calculator-screen" value={expression} readOnly />
       <div className="buttons">
+        <button id="clear" className="clear-btn" onClick={clearInput}>Clear</button>
+        <button id="(" onClick={() => handleButtonClick('(')}>(</button>
         <button onClick={clearInput}>Clear</button>
         <button onClick={() => handleInput('(')}>(</button>
         <button onClick={() => handleInput(')')}>)</button>
